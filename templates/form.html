@@ -1,0 +1,52 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Generate Coupon</title>
+        <link rel="stylesheet" href="/static/style.css" />
+    </head>
+    <body>
+        <div class="container">
+            <h1>Generate Coupon</h1>
+            <form action="/submit" method="POST">
+                <div class="field-group">
+                    <label>Percentage Discount Amount:</label>
+                    <input
+                        type="number"
+                        name="amount"
+                        value="{{.Amount}}"
+                        placeholder="e.g., 15"
+                    />
+                </div>
+
+                <div class="field-group">
+                    <label>Minimum Spend Amount:</label>
+                    <input
+                        type="number"
+                        name="minimum_amount"
+                        value="{{.MinimumAmount}}"
+                        placeholder="e.g., 50"
+                    />
+                </div>
+
+                <input type="submit" id="submit-btn" value="Generate Coupon" />
+            </form>
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const form = document.querySelector("form");
+                const submitBtn = document.getElementById("submit-btn");
+
+                form.addEventListener("submit", function () {
+                    // Disable the button to prevent double submission
+                    submitBtn.disabled = true;
+
+                    // Add loading class and change button content
+                    submitBtn.classList.add("loading");
+                    submitBtn.innerHTML =
+                        '<span class="loading-spinner"></span><span class="loading-text">Generating...</span><span class="normal-text">Generate Coupon</span>';
+                });
+            });
+        </script>
+    </body>
+</html>
