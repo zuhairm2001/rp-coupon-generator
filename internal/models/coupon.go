@@ -26,6 +26,8 @@ type FormData struct {
 	MinimumAmount float64
 	DiscountType  string
 	CouponCode    string
+	ExpiryDate    string
+	UsageLimit    int
 }
 
 type CouponRequest struct {
@@ -34,8 +36,9 @@ type CouponRequest struct {
 	Amount           int          `json:"amount"`
 	IndividualUse    bool         `json:"individual_use"`
 	ExcludeSaleItems bool         `json:"exclude_sale_items"`
-	UsageLimit       int          `json:"usage_limit"`
+	UsageLimit       *int         `json:"usage_limit,omitempty"`
 	MinimumAmount    string       `json:"minimum_amount"`
+	DateExpires      string       `json:"date_expires,omitempty"`
 }
 
 type CouponResponse struct {

@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/zuhairm2001/rp-coupon-generator/internal/models"
 	"github.com/zuhairm2001/rp-coupon-generator/internal/utils"
@@ -22,10 +23,18 @@ func FormHandler(w http.ResponseWriter, r *http.Request) {
 		Amount        int
 		MinimumAmount float64
 		CouponCode    string
+		Expires       bool
+		ExpiryDate    string
+		Today         string
+		UsageLimit    int
 	}{
 		Amount:        10,
 		MinimumAmount: 100.0,
 		CouponCode:    utils.GenerateCode(8),
+		Expires:       false,
+		ExpiryDate:    time.Now().Format("2006-01-02"),
+		Today:         time.Now().Format("2006-01-02"),
+		UsageLimit:    0,
 	}
 
 	if err := formTmpl.Execute(w, data); err != nil {
@@ -110,7 +119,6 @@ func parseFormData(w http.ResponseWriter, r *http.Request) models.FormData {
 		renderError(w, "Invalid minimum amount - please enter a valid number")
 	}
 
-	//no error checking for discount type as it is a drop down
 	discountType := r.FormValue("discount_type")
 
 	couponCode := r.FormValue("coupon_code")
@@ -118,14 +126,61 @@ func parseFormData(w http.ResponseWriter, r *http.Request) models.FormData {
 		renderError(w, "Coupon code is required")
 	}
 
-	log.Printf("Received update: Amount=%s, Min=%s", amount, minimumAmount)
+	expiryOption := r.FormValue("expiry_option")
+	expiryDate := parseExpiryDate(expiryOption, w, r)
+
+	usageLimitStr := r.FormValue("usage_limit")
+	usageLimit := parseUsageLimit(usageLimitStr, w)
+
+	log.Printf("Received update: Amount=%s, Min=%s, Expiry=%s, UsageLimit=%d", amount, minimumAmount, expiryDate, usageLimit)
 
 	data := models.FormData{
 		Amount:        amountInt,
 		MinimumAmount: minimumAmountFloat,
 		DiscountType:  discountType,
 		CouponCode:    couponCode,
+		ExpiryDate:    expiryDate,
+		UsageLimit:    usageLimit,
 	}
 	return data
 
+}
+
+func parseExpiryDate(expiryOption string, w http.ResponseWriter, r *http.Request) string {
+
+	var expiryDate string
+	if expiryOption == "custom_date" {
+		expiryDate = r.FormValue("expiry_date")
+		if expiryDate == "" {
+			renderError(w, "Expiry date is required when custom expiry is selected")
+		}
+
+		// Validate that expiry date is after today
+		parsedExpiryDate, err := time.Parse("2006-01-02", expiryDate)
+		if err != nil {
+			renderError(w, "Invalid expiry date format")
+		}
+
+		today := time.Now().Truncate(24 * time.Hour)
+		if parsedExpiryDate.Before(today) || parsedExpiryDate.Equal(today) {
+			renderError(w, "Expiry date must be after today")
+		}
+	} else {
+		expiryDate = "" // Empty string indicates no expiry
+	}
+	return expiryDate
+}
+
+func parseUsageLimit(usageLimitStr string, w http.ResponseWriter) int {
+	if usageLimitStr != "" {
+		usageLimit, err := strconv.Atoi(usageLimitStr)
+		if err != nil {
+			renderError(w, "Invalid usage limit - please enter a valid number")
+		}
+		if usageLimit < 0 {
+			renderError(w, "Usage limit cannot be negative")
+		}
+		return usageLimit
+	}
+	return 0
 }

@@ -16,11 +16,21 @@ func (c *Client) CreateCoupon(ctx context.Context, formData models.FormData) (*m
 	couponReq := models.CouponRequest{
 		Code:             formData.CouponCode,
 		DiscountType:     models.DiscountType(formData.DiscountType),
-		UsageLimit:       1,
 		Amount:           formData.Amount,
 		IndividualUse:    true,
 		ExcludeSaleItems: true,
 		MinimumAmount:    fmt.Sprintf("%.2f", formData.MinimumAmount),
+	}
+
+	// Handle usage limit - only set if greater than 0
+	if formData.UsageLimit > 0 {
+		couponReq.UsageLimit = &formData.UsageLimit
+	}
+
+	// Handle expiry date - format for WooCommerce API (YYYY-MM-DDTHH:MM:SS)
+	if formData.ExpiryDate != "" {
+		// WooCommerce expects date in format: 2024-12-31T23:59:59
+		couponReq.DateExpires = formData.ExpiryDate + "T23:59:59"
 	}
 
 	jsonData, err := json.Marshal(couponReq)

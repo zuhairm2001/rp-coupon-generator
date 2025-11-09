@@ -48,6 +48,63 @@
                     />
                 </div>
 
+                <div class="field-group">
+                    <label>Expiry Options:</label>
+                    <div class="radio-group">
+                        <label class="radio-option">
+                            <input
+                                type="radio"
+                                name="expiry_option"
+                                value="no_expiry"
+                                {{if
+                                not
+                                .Expires}}checked{{end}}
+                            />
+                            No expiry
+                        </label>
+                        <label class="radio-option">
+                            <input
+                                type="radio"
+                                name="expiry_option"
+                                value="custom_date"
+                                {{if
+                                .Expires}}checked{{end}}
+                            />
+                            Custom expiry date
+                        </label>
+                    </div>
+                </div>
+
+                <div
+                    class="field-group"
+                    id="expiry-date-group"
+                    {{if
+                    not
+                    .Expires}}style="display: none;"
+                    {{end}}
+                >
+                    <label for="expiry-date">Expiry Date:</label>
+                    <input
+                        type="date"
+                        id="expiry-date"
+                        name="expiry_date"
+                        value="{{.ExpiryDate}}"
+                        min="{{.Today}}"
+                    />
+                </div>
+
+                <div class="field-group">
+                    <label for="usage-limit">Usage Limit (optional):</label>
+                    <input
+                        type="number"
+                        id="usage-limit"
+                        name="usage_limit"
+                        value="{{.UsageLimit}}"
+                        placeholder="Leave empty for unlimited usage"
+                        min="0"
+                    />
+                </div>
+
                 <input type="submit" id="submit-btn" value="Generate Coupon" />
             </form>
         </div>
@@ -64,6 +121,31 @@
                 const amountLabel =
                     document.querySelector("label[for='amount']") ||
                     amountInput.previousElementSibling;
+
+                // Expiry date functionality
+                const expiryRadios = document.querySelectorAll(
+                    "input[name='expiry_option']",
+                );
+                const expiryDateGroup =
+                    document.getElementById("expiry-date-group");
+                const expiryDateInput = document.getElementById("expiry-date");
+
+                // Set minimum date to today
+                const today = new Date().toISOString().split("T")[0];
+                expiryDateInput.min = today;
+
+                // Toggle expiry date field based on radio selection
+                expiryRadios.forEach((radio) => {
+                    radio.addEventListener("change", function () {
+                        if (this.value === "custom_date") {
+                            expiryDateGroup.style.display = "block";
+                            expiryDateInput.required = true;
+                        } else {
+                            expiryDateGroup.style.display = "none";
+                            expiryDateInput.required = false;
+                        }
+                    });
+                });
 
                 // Update amount label and placeholder based on discount type
                 function updateAmountField() {
