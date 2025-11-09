@@ -9,12 +9,20 @@
             <h1>Generate Coupon</h1>
             <form action="/submit" method="POST">
                 <div class="field-group">
-                    <label>Percentage Discount Amount:</label>
+                    <label>Discount Type:</label>
+                    <select name="discount_type" id="discount-type">
+                        <option value="percent">Percentage Discount</option>
+                        <option value="fixed_cart">Fixed Cart Discount</option>
+                    </select>
+                </div>
+
+                <div class="field-group">
+                    <label>Discount Amount:</label>
                     <input
                         type="number"
                         name="amount"
                         value="{{.Amount}}"
-                        placeholder="e.g., 15"
+                        placeholder="e.g., 15 for percentage or 10 for fixed amount"
                     />
                 </div>
 
@@ -28,6 +36,18 @@
                     />
                 </div>
 
+                <div class="field-group">
+                    <label for="coupon">Coupon Code:</label>
+                    <input
+                        type="text"
+                        id="coupon"
+                        name="coupon_code"
+                        value="{{.CouponCode}}"
+                        required
+                        autocomplete="off"
+                    />
+                </div>
+
                 <input type="submit" id="submit-btn" value="Generate Coupon" />
             </form>
         </div>
@@ -36,6 +56,40 @@
             document.addEventListener("DOMContentLoaded", function () {
                 const form = document.querySelector("form");
                 const submitBtn = document.getElementById("submit-btn");
+                const discountTypeSelect =
+                    document.getElementById("discount-type");
+                const amountInput = document.querySelector(
+                    "input[name='amount']",
+                );
+                const amountLabel =
+                    document.querySelector("label[for='amount']") ||
+                    amountInput.previousElementSibling;
+
+                // Update amount label and placeholder based on discount type
+                function updateAmountField() {
+                    const selectedType = discountTypeSelect.value;
+
+                    if (selectedType === "percent") {
+                        amountLabel.textContent = "Percentage Discount Amount:";
+                        amountInput.placeholder = "e.g., 15";
+                    } else if (selectedType === "fixed_cart") {
+                        amountLabel.textContent = "Fixed Cart Discount Amount:";
+                        amountInput.placeholder = "e.g., 10";
+                    } else if (selectedType === "fixed_product") {
+                        amountLabel.textContent =
+                            "Fixed Product Discount Amount:";
+                        amountInput.placeholder = "e.g., 10";
+                    }
+                }
+
+                // Initialize the amount field
+                updateAmountField();
+
+                // Update when discount type changes
+                discountTypeSelect.addEventListener(
+                    "change",
+                    updateAmountField,
+                );
 
                 form.addEventListener("submit", function () {
                     // Disable the button to prevent double submission

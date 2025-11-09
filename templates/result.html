@@ -25,7 +25,7 @@
             }
 
             .coupon-code {
-                font-family: 'Courier New', monospace;
+                font-family: "Courier New", monospace;
                 font-size: 24px;
                 font-weight: bold;
                 background-color: #f8f9fa;
@@ -96,33 +96,58 @@
     </head>
     <body>
         <div class="container">
-            <div class="result-container {{if .Success}}success{{else}}error{{end}}">
+            <div
+                class="result-container {{if .Success}}success{{else}}error{{end}}"
+            >
                 {{if .Success}}
-                    <div class="success-icon">✅</div>
-                    <h1>Coupon Generated Successfully!</h1>
-                    <p>Your coupon has been created and is ready to use.</p>
+                <div class="success-icon">✅</div>
+                <h1>Coupon Generated Successfully!</h1>
+                <p>Your coupon has been created and is ready to use.</p>
 
-                    <div class="coupon-code">{{.CouponCode}}</div>
+                <div class="coupon-code">{{.CouponCode}}</div>
 
-                    {{if .CouponDetails}}
-                    <div class="details">
-                        <h3>Coupon Details:</h3>
-                        <p><strong>Code:</strong> {{.CouponDetails.Code}}</p>
-                        <p><strong>Discount:</strong> {{.CouponDetails.Amount}}% off</p>
-                        <p><strong>Minimum Spend:</strong> ${{.CouponDetails.MinimumAmount}}</p>
-                        <p><strong>Usage Limit:</strong> {{if .CouponDetails.UsageLimit}}{{.CouponDetails.UsageLimit}}{{else}}Unlimited{{end}}</p>
-                        <p><strong>Expires:</strong> {{if .CouponDetails.DateExpires}}{{.CouponDetails.DateExpires}}{{else}}No expiration{{end}}</p>
-                    </div>
-                    {{end}}
+                {{if .CouponDetails}}
+                <div class="details">
+                    <h3>Coupon Details:</h3>
+                    <p><strong>Code:</strong> {{.CouponDetails.Code}}</p>
+                    <p>
+                        <strong>Discount:</strong>
+                        {{if eq .CouponDetails.DiscountType "percent"}}
+                        {{.CouponDetails.Amount}}% off {{else}}
+                        ${{.CouponDetails.Amount}} off {{end}}
+                    </p>
+                    <p>
+                        <strong>Minimum Spend:</strong>
+                        ${{.CouponDetails.MinimumAmount}}
+                    </p>
+                    <p>
+                        <strong>Usage Limit:</strong> {{if
+                        .CouponDetails.UsageLimit}}{{.CouponDetails.UsageLimit}}{{else}}Unlimited{{end}}
+                    </p>
+                    <p>
+                        <strong>Expires:</strong> {{if
+                        .CouponDetails.DateExpires}}{{.CouponDetails.DateExpires}}{{else}}No
+                        expiration{{end}}
+                    </p>
+                </div>
+                {{end}}
 
-                    <p><em>Copy the coupon code above and use it during checkout.</em></p>
+                <p>
+                    <em
+                        >Copy the coupon code above and use it during
+                        checkout.</em
+                    >
+                </p>
                 {{else}}
-                    <div class="error-icon">❌</div>
-                    <h1>Coupon Generation Failed</h1>
-                    <div class="error-message">
-                        {{.ErrorMessage}}
-                    </div>
-                    <p><em>Please try again or contact support if the problem persists.</em></p>
+                <div class="error-icon">❌</div>
+                <h1>Coupon Generation Failed</h1>
+                <div class="error-message">{{.ErrorMessage}}</div>
+                <p>
+                    <em
+                        >Please try again or contact support if the problem
+                        persists.</em
+                    >
+                </p>
                 {{end}}
 
                 <a href="/" class="back-button">Generate Another Coupon</a>

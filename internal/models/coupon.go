@@ -1,13 +1,41 @@
 package models
 
+type DiscountType string
+
+const (
+	Percentage   DiscountType = "percent"
+	Fixed        DiscountType = "fixed_cart"
+	FixedProduct DiscountType = "fixed_product"
+)
+
+type ResultData struct {
+	Success       bool
+	CouponCode    string
+	CouponDetails CouponResponse
+	ErrorMessage  string
+}
+
+type EnvData struct {
+	BaseURL   string
+	APIKey    string
+	APISecret string
+}
+
+type FormData struct {
+	Amount        int
+	MinimumAmount float64
+	DiscountType  string
+	CouponCode    string
+}
+
 type CouponRequest struct {
-	Code             string `json:"code"`
-	DiscountType     string `json:"discount_type"`
-	Amount           int    `json:"amount"`
-	IndividualUse    bool   `json:"individual_use"`
-	ExcludeSaleItems bool   `json:"exclude_sale_items"`
-	UsageLimit       int    `json:"usage_limit"`
-	MinimumAmount    string `json:"minimum_amount"`
+	Code             string       `json:"code"`
+	DiscountType     DiscountType `json:"discount_type"`
+	Amount           int          `json:"amount"`
+	IndividualUse    bool         `json:"individual_use"`
+	ExcludeSaleItems bool         `json:"exclude_sale_items"`
+	UsageLimit       int          `json:"usage_limit"`
+	MinimumAmount    string       `json:"minimum_amount"`
 }
 
 type CouponResponse struct {
